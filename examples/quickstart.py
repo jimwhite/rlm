@@ -7,13 +7,18 @@ from rlm.logger import RLMLogger
 
 load_dotenv()
 
-logger = RLMLogger(log_dir="./logs")
+logger = RLMLogger(log_dir="/workspaces/rlm/logs")
+
+# LMStudio endpoint from inside Docker container
+LMSTUDIO_BASE_URL = "http://host.docker.internal:1234/v1"
+LMSTUDIO_MODEL = "qwen/qwen3-coder-30b"
 
 rlm = RLM(
     backend="openai",  # or "portkey", etc.
     backend_kwargs={
-        "model_name": "gpt-5-nano",
-        "api_key": os.getenv("OPENAI_API_KEY"),
+        "base_url": LMSTUDIO_BASE_URL,
+        "model_name": LMSTUDIO_MODEL,
+        "api_key": "***",
     },
     environment="local",
     environment_kwargs={},
