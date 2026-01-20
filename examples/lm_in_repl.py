@@ -3,17 +3,17 @@ Example: Using llm_query() from within a Local REPL environment.
 
 This demonstrates the LM Handler + LocalREPL integration where code
 running in the REPL can query the LLM via socket connection.
+
+Uses LMStudio running on the host machine with an OpenAI-compatible API.
 """
 
-import os
-
-from dotenv import load_dotenv
-
-from rlm.clients.portkey import PortkeyClient
+from rlm.clients.openai import OpenAIClient
 from rlm.core.lm_handler import LMHandler
 from rlm.environments.local_repl import LocalREPL
 
-load_dotenv()
+# LMStudio endpoint from inside Docker container
+LMSTUDIO_BASE_URL = "http://host.docker.internal:1234/v1"
+LMSTUDIO_MODEL = "qwen/qwen3-coder-30b"
 
 setup_code = """
 secret = "1424424"
@@ -33,14 +33,12 @@ print("Secret from setup code: ", secret)
 
 
 def main():
-    api_key = os.environ.get("PORTKEY_API_KEY")
-    if not api_key:
-        print("Error: PORTKEY_API_KEY not set")
-        return
-    print(f"PORTKEY_API_KEY: {api_key}")
-
-    client = PortkeyClient(api_key=api_key, model_name="@openai/gpt-5-nano")
-    print("Created Portkey client with model: @openai/gpt-5-nano")
+    client = OpenAIClient(
+        api_key="lm-studio",  # LMStudio doesn't require a real API key
+        model_name=LMSTUDIO_MODEL,
+        base_url=LMSTUDIO_BASE_URL,
+    )
+    print(f"Created LMStudio client with model: {LMSTUDIO_MODEL}")
 
     # Start LM Handler
     with LMHandler(client=client) as handler:
